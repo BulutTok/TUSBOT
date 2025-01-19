@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tus Data</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .chat-container {
+      width: 50%;
+      max-width: 800px;
+      height: 60%;
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-header h1 {
+      margin: 0;
+      text-align: center;
+    }
+    .message-container {
+      flex: 1;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      background: #fafafa;
+    }
+    .user-message, .chatbot-message {
+      margin: 8px 0;
+      display: flex;
+    }
+    .user-message {
+      justify-content: flex-end;
+    }
+    .chatbot-message {
+      justify-content: flex-start;
+    }
+    .message-content {
+      max-width: 60%;
+      padding: 10px;
+      border-radius: 10px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+    .user-message .message-content {
+      background-color: #007bff;
+      color: #fff;
+    }
+    .chatbot-message .message-content {
+      background-color: #ececec;
+    }
+    .input-container {
+      display: flex;
+      gap: 10px;
+    }
+    .input-container input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+    .input-container button {
+      padding: 10px 20px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .input-container button:hover {
+      background: #005dc1;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <h1>Tus Data</h1>
+    </div>
+    <div id="message-container" class="message-container">
+      <div class="chatbot-message">
+        <div class="message-content">
+          Merhaba, ben Tus Data. Tıbbi sorularınıza yardımcı olmak için buradayım. Ne sormak istersiniz?
+        </div>
+      </div>
+    </div>
+    <div class="input-container">
+      <input id="user-input" type="text" placeholder="Sorunuzu buraya yazın...">
+      <button onclick="sendMessage()">Gönder</button>
+    </div>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const userInput = document.getElementById('user-input').value.trim();
+      if (!userInput) return;
+
+      addMessage('user', userInput);
+      document.getElementById('user-input').value = '';
+
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: userInput })
+        });
+
+        const data = await response.json();
+        if (data.reply) {
+          addMessage('chatbot', data.reply);
+        } else if (data.error) {
+          addMessage('chatbot', "Hata: " + data.error);
+        }
+      } catch (error) {
+        addMessage('chatbot', "Hata: " + error.toString());
+      }
+    }
+
+    function addMessage(sender, text) {
+      const container = document.getElementById('message-container');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = sender === 'user' ? 'user-message' : 'chatbot-message';
+
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'message-content';
+      contentDiv.textContent = text;
+
+      messageDiv.appendChild(contentDiv);
+      container.appendChild(messageDiv);
+      container.scrollTop = container.scrollHeight;
+    }
+  </script>
+</body>
+</html>
