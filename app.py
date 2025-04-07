@@ -10,7 +10,7 @@ from tenacity import retry, stop_after_attempt, wait_fixed
 app = Flask(__name__)
 
 # Set up OpenAI API key
-openai.api_key = "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"  # Replace with your actual API key
+openai.api_key = "API-KEY"  # Replace with your actual API key
 
 # Load all JSON files from the local folder
 def load_json_files_from_folder(folder_path):
